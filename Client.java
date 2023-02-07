@@ -9,10 +9,17 @@ public class Client {
     private DataInputStream dataInputStream;
     private BufferedReader bufferedReader;
 
-    public void uploadFile(String filename) {
+    public void uploadFile(String command, String filename) {
         File file = new File(filename);
         try {
             FileInputStream fileInputStream = new FileInputStream(file);
+
+            try {
+                dataOutputStream.writeUTF(command + " " + file.length());
+            } catch(IOException exception) {
+                System.out.println("ERROR OCCURRED: Issue sending the command type");
+            }
+
             int bytes = 0;
             byte[] buffer = new byte[1000];
             while((bytes = fileInputStream.read(buffer)) > 0){
@@ -37,8 +44,9 @@ public class Client {
             String filename = command.split(" ")[1];
             if(filename.contains(" "))
                 System.out.println("Please enter valid filename");
-            else
-                uploadFile(filename);
+            else {
+                uploadFile(command, filename);
+            }
         }
         else
             System.out.println("Unsupported command: try get <filename> | upload <filename> ");
