@@ -1,4 +1,3 @@
-import javax.sound.midi.Soundbank;
 import java.io.*;
 import java.net.Socket;
 import java.net.UnknownHostException;
@@ -10,11 +9,25 @@ public class Client {
     private DataInputStream dataInputStream;
     private BufferedReader bufferedReader;
 
-    public void uploadFile(String filename){
-
+    public void uploadFile(String filename) {
+        File file = new File(filename);
+        try {
+            FileInputStream fileInputStream = new FileInputStream(file);
+            int bytes = 0;
+            byte[] buffer = new byte[1000];
+            while((bytes = fileInputStream.read(buffer)) > 0){
+                dataOutputStream.write(buffer, 0, bytes);
+                dataOutputStream.flush();
+            }
+        } catch (FileNotFoundException fileNotFoundException){
+            System.out.println("ERROR OCCURRED: File not found. Please specify the correct file name");
+        } catch (IOException e) {
+            System.out.println("ERROR OCCURRED: Issue occurred with file input stream, while checking the availability");
+        }
     }
 
     public void getFile(){
+
     }
 
     public void executeCommand(String command){
@@ -49,7 +62,7 @@ public class Client {
         } catch (UnknownHostException e) {
             System.out.println("ERROR OCCURRED: Unknown Host");
         } catch (IOException e) {
-            System.out.println("ERROR OCCURRED: I/O error");
+            System.out.println("ERROR OCCURRED: I/O error while creating the socket");
         } finally {
             try {
                 dataInputStream.close();
