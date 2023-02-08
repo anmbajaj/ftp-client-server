@@ -4,6 +4,8 @@ import java.net.UnknownHostException;
 
 public class Client {
 
+    private static final int FILE_SIZE = 1000;
+
     private Socket socket;
     private DataOutputStream dataOutputStream;
     private DataInputStream dataInputStream;
@@ -13,19 +15,20 @@ public class Client {
         File file = new File(filename);
         try {
             FileInputStream fileInputStream = new FileInputStream(file);
-
             try {
                 dataOutputStream.writeUTF(command + " " + file.length());
             } catch(IOException exception) {
-                System.out.println("ERROR OCCURRED: Issue sending the command type");
+                System.out.println("ERROR OCCURRED: Issue sending the upload command type");
             }
 
+            System.out.println("Sending " + filename + " to server");
             int bytes = 0;
-            byte[] buffer = new byte[1000];
+            byte[] buffer = new byte[FILE_SIZE];
             while((bytes = fileInputStream.read(buffer)) > 0){
                 dataOutputStream.write(buffer, 0, bytes);
                 dataOutputStream.flush();
             }
+            System.out.println("File sent successfully");
         } catch (FileNotFoundException fileNotFoundException){
             System.out.println("ERROR OCCURRED: File not found. Please specify the correct file name");
         } catch (IOException e) {
@@ -33,13 +36,41 @@ public class Client {
         }
     }
 
-    public void getFile(){
+    public void downloadFile(String command, String filename){
+        try {
+            dataOutputStream.writeUTF(command);
+            String reply = dataInputStream.readUTF();
+            if(reply.equals("No such file exists"))
+                System.out.println("Please enter valid file name for download");
+            else{
+                long size = Long.valueOf(reply);
+                FileOutputStream fileOutputStream = new FileOutputStream("New" + filename);
 
+                System.out.println("Downloading " + filename);
+                int bytes = 0;
+                byte[] buffer = new byte[FILE_SIZE];
+                while(size > 0 && (bytes = dataInputStream.read(buffer, 0, (int) Math.min(buffer.length, size))) != -1){
+                    fileOutputStream.write(buffer, 0, bytes);
+                    size -= bytes;
+                }
+                fileOutputStream.close();
+                System.out.println(filename + " download complete");
+            }
+        } catch(IOException exception) {
+            System.out.println("ERROR OCCURRED: Issue sending the upload command type");
+        }
     }
 
     public void executeCommand(String command){
-        if(command.startsWith("get"))
-            getFile();
+        if(command.startsWith("get")) {
+            String filename = command.split(" ")[1];
+            if(filename.contains(" "))
+                System.out.println("Please enter valid filename");
+            else {
+                downloadFile(command, filename);
+            }
+
+        }
         else if(command.startsWith("upload")){
             String filename = command.split(" ")[1];
             if(filename.contains(" "))
@@ -55,7 +86,7 @@ public class Client {
     public void run(String hostname, String port) throws IOException {
         try {
             socket = new Socket(hostname, Integer.valueOf(port));
-            System.out.println("Connected to" + hostname + " at port " + port);
+            System.out.println("Connected to " + hostname + " at port " + port);
 
             dataInputStream = new DataInputStream(socket.getInputStream());
             dataOutputStream = new DataOutputStream(socket.getOutputStream());
