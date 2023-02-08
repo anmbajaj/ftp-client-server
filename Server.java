@@ -66,6 +66,7 @@ public class Server {
     public void run(){
         try{
             serverSocket = new ServerSocket(PORT, 10);
+            System.out.println("Server started at port " + PORT);
             System.out.println("Waiting for connection");
 
             clientConnection = serverSocket.accept();
