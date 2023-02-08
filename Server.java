@@ -6,7 +6,7 @@ public class Server {
 
     private static final int PORT = 8080;
 
-    private static final int FILE_SIZE = 1000;
+    private static final int CHUNK_SIZE = 1000;
 
     private ServerSocket serverSocket;
     private Socket clientConnection;
@@ -22,7 +22,7 @@ public class Server {
             System.out.println("Receiving file " + messages[1]);
 
             int bytes = 0;
-            byte[] buffer = new byte[FILE_SIZE];
+            byte[] buffer = new byte[CHUNK_SIZE];
             while(size > 0 && (bytes = dataInputStream.read(buffer, 0, (int) Math.min(buffer.length, size))) != -1){
                 fileOutputStream.write(buffer, 0, bytes);
                 size -= bytes;
@@ -43,7 +43,7 @@ public class Server {
 
             System.out.println("Sending file ");
             int bytes = 0;
-            byte[] buffer = new byte[FILE_SIZE];
+            byte[] buffer = new byte[CHUNK_SIZE];
             while((bytes = fileInputStream.read(buffer)) > 0){
                 dataOutputStream.write(buffer, 0, bytes);
                 dataOutputStream.flush();
@@ -53,6 +53,7 @@ public class Server {
             System.out.println("File sent successfully");
         } catch (FileNotFoundException fileNotFoundException) {
             try {
+                System.out.println("No such file");
                 dataOutputStream.writeUTF("No such file exists");
             } catch (IOException ioException){
                 System.out.println("SERVER ERROR: IO Exception occurred while notifying the non-existence of file");

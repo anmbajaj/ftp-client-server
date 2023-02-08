@@ -4,7 +4,7 @@ import java.net.UnknownHostException;
 
 public class Client {
 
-    private static final int FILE_SIZE = 1000;
+    private static final int CHUNK_SIZE = 1000;
 
     private Socket socket;
     private DataOutputStream dataOutputStream;
@@ -23,7 +23,7 @@ public class Client {
 
             System.out.println("Sending " + filename + " to server");
             int bytes = 0;
-            byte[] buffer = new byte[FILE_SIZE];
+            byte[] buffer = new byte[CHUNK_SIZE];
             while((bytes = fileInputStream.read(buffer)) > 0){
                 dataOutputStream.write(buffer, 0, bytes);
                 dataOutputStream.flush();
@@ -41,14 +41,14 @@ public class Client {
             dataOutputStream.writeUTF(command);
             String reply = dataInputStream.readUTF();
             if(reply.equals("No such file exists"))
-                System.out.println("Please enter valid file name for download");
+                System.out.println("Please enter a valid file name for download");
             else{
                 long size = Long.valueOf(reply);
                 FileOutputStream fileOutputStream = new FileOutputStream("New" + filename);
 
                 System.out.println("Downloading " + filename);
                 int bytes = 0;
-                byte[] buffer = new byte[FILE_SIZE];
+                byte[] buffer = new byte[CHUNK_SIZE];
                 while(size > 0 && (bytes = dataInputStream.read(buffer, 0, (int) Math.min(buffer.length, size))) != -1){
                     fileOutputStream.write(buffer, 0, bytes);
                     size -= bytes;
@@ -99,7 +99,7 @@ public class Client {
             }
 
         } catch (UnknownHostException e) {
-            System.out.println("ERROR OCCURRED: Unknown Host");
+            System.out.println("ERROR OCCURRED: Unknown Host.");
         } catch (IOException e) {
             System.out.println("ERROR OCCURRED: I/O error while creating the socket");
         } finally {
