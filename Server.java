@@ -8,6 +8,8 @@ public class Server {
 
     private static final int CHUNK_SIZE = 1000;
 
+    private static final String PATH = "/Users/anmbajaj/UF/Spring 2023/CN/ftp-client-server/";
+
     private ServerSocket serverSocket;
     private Socket clientConnection;
     private DataInputStream dataInputStream;
@@ -18,7 +20,7 @@ public class Server {
         long size = Long.valueOf(messages[2]);
 
         try {
-            FileOutputStream fileOutputStream = new FileOutputStream("New" + messages[1]);
+            FileOutputStream fileOutputStream = new FileOutputStream(PATH + "New" + messages[1]);
             System.out.println("Receiving file " + messages[1]);
 
             int bytes = 0;
@@ -38,7 +40,7 @@ public class Server {
     public void sendFile(String message){
         String[] messages = message.split(" ");
         try {
-            FileInputStream fileInputStream = new FileInputStream(messages[1]);
+            FileInputStream fileInputStream = new FileInputStream(PATH + messages[1]);
             dataOutputStream.writeUTF(String.valueOf(fileInputStream.available()));
 
             System.out.println("Sending file ");

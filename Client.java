@@ -6,13 +6,15 @@ public class Client {
 
     private static final int CHUNK_SIZE = 1000;
 
+    private static final String PATH = "/Users/anmbajaj/UF/Spring 2023/CN/ftp-client-server/";
+
     private Socket socket;
     private DataOutputStream dataOutputStream;
     private DataInputStream dataInputStream;
     private BufferedReader bufferedReader;
 
     public void uploadFile(String command, String filename) {
-        File file = new File(filename);
+        File file = new File(PATH + filename);
         try {
             FileInputStream fileInputStream = new FileInputStream(file);
             try {
@@ -44,7 +46,7 @@ public class Client {
                 System.out.println("Please enter a valid file name for download");
             else{
                 long size = Long.valueOf(reply);
-                FileOutputStream fileOutputStream = new FileOutputStream("New" + filename);
+                FileOutputStream fileOutputStream = new FileOutputStream(PATH + "New" + filename);
 
                 System.out.println("Downloading " + filename);
                 int bytes = 0;
@@ -115,7 +117,7 @@ public class Client {
 
     public static void main(String[] args) throws IOException {
         if(args.length != 2){
-            System.out.println("Syntax is: java Client <hostname> <port>");
+            System.out.println("Syntax is: ftpclient <hostname> <port>");
             System.exit(1);
         }
         Client client = new Client();
